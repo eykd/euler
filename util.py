@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """util -- utility functions for the Euler Project.
 """
+import operator
 from collections import deque
 from nose.tools import *
-
 
 def factor(n):
     factors = deque()
@@ -139,3 +139,5 @@ class PrimeFactory(object):
 primes = PrimeFactory()
 
 
+def product(n):
+    return reduce(operator.mul, n)
