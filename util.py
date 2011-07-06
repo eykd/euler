@@ -5,6 +5,25 @@ from collections import deque
 from nose.tools import *
 
 
+def factor(n):
+    factors = deque()
+    for x in primes:
+        while not n % x:
+            factors.append(x)
+            n = n / x
+        if n == 1:
+            return factors
+
+
+def factor_test():
+    """The prime factors of 13195 are 5, 7, 13 and 29.
+    """
+    assert_equal(
+        list(factor(13195)),
+        [5, 7, 13, 29]
+        )
+
+
 def fib(max_term=4000000, max_n=None):
     n = 0
     a = 0
@@ -23,6 +42,28 @@ def fib_test():
         )
         
 
+def naturals_to(n):
+    return xrange(1, n+1)
+
+
+def numbersOfLength(n):
+    start = int('1' + '0'*(n-1))
+    end = int('1' + '0'*(n))
+    return xrange(start, end)
+
+
+def numbersOfLength_test():
+    assert_equal(
+        list(numbersOfLength(1)),
+        range(1, 10)
+        )
+
+    assert_equal(
+        list(numbersOfLength(2)),
+        range(10, 100)
+        )
+
+
 class PrimeFactory(object):
     _chunk_size = 100
     _found = set()
@@ -39,7 +80,7 @@ class PrimeFactory(object):
             PrimeFactory._primes.next()
 
     @classmethod
-    def primes(klass, max_term=None):
+    def primes(klass, max_term=None, max_n=None):
         i = 0
         while True:
             try:
@@ -51,9 +92,12 @@ class PrimeFactory(object):
             if max_term is None or n <= max_term:
                 yield n
             else:
-                raise StopIteration()
+                break
 
             i += 1
+
+            if max_n is not None and i == max_n:
+                break
 
     def __iter__(self):
         return self.primes()
@@ -93,41 +137,5 @@ class PrimeFactory(object):
             klass._n += 1
 
 primes = PrimeFactory()
-
-
-def numbersOfLength(n):
-    start = int('1' + '0'*(n-1))
-    end = int('1' + '0'*(n))
-    return xrange(start, end)
-
-
-def numbersOfLength_test():
-    assert_equal(
-        list(numbersOfLength(1)),
-        range(1, 10)
-        )
-
-    assert_equal(
-        list(numbersOfLength(2)),
-        range(10, 100)
-        )
-
-
-def factor(n):
-    factors = deque()
-    for x in primes:
-        while not n % x:
-            factors.append(x)
-            n = n / x
-        if n == 1:
-            return factors
-
-def factor_test():
-    """The prime factors of 13195 are 5, 7, 13 and 29.
-    """
-    assert_equal(
-        list(factor(13195)),
-        [5, 7, 13, 29]
-        )
 
 
