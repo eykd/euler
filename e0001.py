@@ -7,10 +7,17 @@ Find the sum of all the multiples of 3 or 5 below 1000.
 """
 import pprint
 
+
 def main():
     return sum(x for x in xrange(1, 1000) if not x % 3 or not x % 5)
 
 
+def main_test():
+    assert_equal(main(), 233168)
+
+
 if __name__ == '__main__':
     pprint.pprint(main())
+else:
+    from nose.tools import *
 

@@ -13,18 +13,31 @@ def fib(max_term=4000000, max_n=None):
     n = 0
     a = 0
     b = 1
-    while b < max_term and (max_n is None or n <= max_n):
+    while b < max_term and (max_n is None or n < max_n):
         c = a + b
         a = b
         b = c
         yield c
         n += 1
+
+def fib_test():
+    assert_equal(
+        list(fib(max_n=10)),
+        [1, 2, 3, 5, 8, 13, 21, 34, 55, 89],
+        )
         
 
 def main():
     return sum(x for x in fib(max_term=4000000) if not x % 2)
 
 
+def main_test():
+    assert_equal(main(),
+                 4613732
+                 )
+
+
 if __name__ == '__main__':
     pprint.pprint(main())
-
+else:
+    from nose.tools import *

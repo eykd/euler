@@ -50,9 +50,8 @@ class PrimeFactory(object):
         if not candidates:
             return
         min_c = min(candidates)
-        max_c = max(candidates)
         t = n*2
-        while t < max_term and t <= max_c:
+        while t < max_term:
             if t >= min_c:
                 try:
                     candidates.remove(t)
@@ -91,13 +90,28 @@ def factor(n):
         if n == 1:
             return factors
 
+def factor_test():
+    """The prime factors of 13195 are 5, 7, 13 and 29.
+    """
+    assert_equal(
+        list(factor(13195)),
+        [5, 7, 13, 29]
+        )
+
 
 def main():
     return max(factor(600851475143))
+
+
+def main_test():
+    assert_equal(
+        main(),
+        6857)
 
 
 if __name__ == '__main__':
     result = main()
     if result:
         pprint.pprint(result)
-
+else:
+    from nose.tools import *
