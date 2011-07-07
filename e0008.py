@@ -36,6 +36,9 @@ def main():
 
     max_product = 0
 
+    # Deques don't support slice notation, so we have to use a fancy
+    # generator to grab the first five items. We want to use a deque,
+    # since it offers fast endpoint access/modification.
     slice_size = range(5)
 
     while len(digits) >= 5:
