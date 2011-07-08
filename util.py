@@ -24,11 +24,11 @@ def factor_test():
         )
 
 
-def fib(max_term=4000000, max_n=None):
+def fib(max_term=4000000, max_step=None):
     n = 0
     a = 0
     b = 1
-    while b < max_term and (max_n is None or n < max_n):
+    while b < max_term and (max_step is None or n < max_step):
         c = a + b
         a = b
         b = c
@@ -37,7 +37,7 @@ def fib(max_term=4000000, max_n=None):
 
 def fib_test():
     assert_equal(
-        list(fib(max_n=10)),
+        list(fib(max_step=10)),
         [1, 2, 3, 5, 8, 13, 21, 34, 55, 89],
         )
         
@@ -65,38 +65,51 @@ def numbersOfLength_test():
 
 
 class PrimeFactory(object):
-    _chunk_size = 100
-    _found = set()
-    _found_sorted = deque()
+    _chunk_size = 1000
+    _found_sorted = deque([2,3,5])
+    _found = set(_found_sorted)
     _candidates = set()
     _candidates_sorted = []
     _chunk_max = 1
-    _n = 2
-    _primes = None
+    _n = 7
 
-    def __init__(self):
-        if PrimeFactory._primes is None:
-            PrimeFactory._primes = self._generate_primes()
-            PrimeFactory._primes.next()
+    @property
+    def chunk_size(self):
+        return PrimeFactory._chunk_size
 
-    @classmethod
-    def primes(klass, max_term=None, max_n=None):
+    @chunk_size.setter
+    def chunk_size(self, val):
+        PrimeFactory._chunk_size = val
+
+    @property
+    def _primes_gen(self):
+        #print "Creating primes generator..."
+        PrimeFactory._primes_gen = PrimeFactory._generate_primes()
+        #print "Priming the pump."
+        PrimeFactory._primes_gen.next()
+        return PrimeFactory._primes_gen
+
+    def primes(self, max_term=None, max_step=None):
         i = 0
         while True:
             try:
-                n = klass._found_sorted[i]
+                n = self._found_sorted[i]
             except IndexError:
-                klass._primes.next()
-                n = klass._found_sorted[i]
+                previously = len(self._found_sorted)
+                while len(self._found_sorted) == previously:
+                    #print "Ran out of primes. Generating more..."
+                    self._primes_gen.next()  # <-- this won't always extend self._found_sorted.
+                n = self._found_sorted[i]
 
             if max_term is None or n <= max_term:
+                #print n
                 yield n
             else:
                 break
 
             i += 1
 
-            if max_n is not None and i == max_n:
+            if max_step is not None and i == max_step:
                 break
 
     def __iter__(self):
@@ -105,10 +118,13 @@ class PrimeFactory(object):
     @staticmethod
     def sieve(n, candidates, max_term):
         #print "Sieving %s candidates by %s" % (len(candidates), n)
+        #print "Candidates:", candidates
         if not candidates:
             return
         min_c = min(candidates)
-        t = n*2
+        #t = n * ((min_c / n) + 1)  ### SLOW...
+        t = n * 2
+        #print "Starting w/", t
         while t < max_term:
             if t >= min_c:
                 try:
@@ -116,7 +132,7 @@ class PrimeFactory(object):
                 except KeyError:
                     pass
             t += n
-        #print candidates
+        #print "Candidates remaining:", candidates
 
     @classmethod
     def _generate_primes(klass):
@@ -125,11 +141,14 @@ class PrimeFactory(object):
                 # Reset the candidates with the next range.
                 klass._chunk_max += klass._chunk_size
                 klass._candidates_sorted[:] = sorted(klass._candidates)
+                #print "Found %s primes." % (len(klass._candidates_sorted))
+                #print "Sorting them..."
                 klass._found.update(klass._candidates)
                 klass._found_sorted.extend(klass._candidates_sorted)
                 klass._candidates.clear()
                 yield None
-                klass._candidates.update(xrange(klass._n, klass._chunk_max))
+                klass._candidates.update(xrange(klass._n, klass._chunk_max, 2))
+                #print "Generating next chunk of %s... (%s to %s)" % (klass._chunk_size, klass._n, klass._chunk_max-1)
                 for x in klass._found_sorted:
                     klass.sieve(x, klass._candidates, klass._chunk_max)
             if klass._n in klass._candidates:
