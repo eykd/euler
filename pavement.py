@@ -2,13 +2,14 @@
 """pavement.py -- paver tasks for Project Euler problems.
 """
 from paver.easy import *
+from paved.util import shv
 
 __path__ = path(__file__).abspath().dirname()
 
 
 @task
 def test():
-    sh('nosetests --all-modules')
+    shv('nosetests --all-modules')
 
 @task
 @consume_args
@@ -17,4 +18,4 @@ def run(args):
         for arg in args:
             if fn.namebase.endswith(arg):
                 print '\n\n---------------->'
-                sh('time python %s' % fn)
+                shv('time python %s' % fn)
