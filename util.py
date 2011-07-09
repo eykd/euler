@@ -189,7 +189,7 @@ def fast_primes(n):
     http://stackoverflow.com/questions/2068372/fastest-way-to-list-all-primes-below-n-in-python/3035188#3035188
     """
     correction = int(n%6>1)
-    n = {0:n,1:n-1,2:n+4,3:n+3,4:n+2,5:n+1}[n%6]
+    n = {0:n, 1:n-1, 2:n+4, 3:n+3, 4:n+2, 5:n+1}[n%6]
     sieve = [True] * (n/3)
     sieve[0] = False
     for i in xrange(int(n**0.5)/3+1):
