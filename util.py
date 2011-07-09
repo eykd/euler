@@ -115,8 +115,15 @@ class PrimeFactory(object):
     def __iter__(self):
         return self.primes()
 
+    def __call__(self, max_term=None, max_step=None):
+        return 
+
+    @classmethod
+    def _generate_primes(klass):
+        return klass.sieve_of_eratosthenes()
+
     @staticmethod
-    def sieve(n, candidates, max_term):
+    def sieve_1(n, candidates, max_term, max_sqrt=None):
         #print "Sieving %s candidates by %s" % (len(candidates), n)
         #print "Candidates:", candidates
         if not candidates:
@@ -126,20 +133,38 @@ class PrimeFactory(object):
         t = n * 2
         #print "Starting w/", t
         while t < max_term:
-            if t >= min_c:
-                try:
-                    candidates.remove(t)
-                except KeyError:
-                    pass
+            if t >= min_c and t in candidates:
+                candidates.remove(t)
             t += n
         #print "Candidates remaining:", candidates
 
+    @staticmethod
+    def sieve_2(n, candidates, max_term, max_sqrt):
+        #print "Sieving %s candidates by %s" % (len(candidates), n)
+        #print "Candidates:", candidates
+        if not candidates:
+            return
+        min_c = min(candidates)
+        
+        #print "Starting w/", n*3
+        for t in xrange(3*n, max_term, n*2):
+            if t >= min_c and t in candidates and t <= max_sqrt:
+                candidates.remove(t)
+        #print "Candidates remaining:", candidates
+                
+
     @classmethod
-    def _generate_primes(klass):
+    def sieve_of_eratosthenes(klass):
+        """http://en.wikipedia.org/wiki/Sieve_of_Eratosthenes
+        """
+        sieve = klass.sieve_1
+        sieve = klass.sieve_2
+        
         while True:
             if klass._n >= klass._chunk_max:
                 # Reset the candidates with the next range.
                 klass._chunk_max += klass._chunk_size
+                klass._chunk_max_sqrt = int(klass._chunk_max**0.5)
                 klass._candidates_sorted[:] = sorted(klass._candidates)
                 #print "Found %s primes." % (len(klass._candidates_sorted))
                 #print "Sorting them..."
@@ -150,12 +175,31 @@ class PrimeFactory(object):
                 klass._candidates.update(xrange(klass._n, klass._chunk_max, 2))
                 #print "Generating next chunk of %s... (%s to %s)" % (klass._chunk_size, klass._n, klass._chunk_max-1)
                 for x in klass._found_sorted:
-                    klass.sieve(x, klass._candidates, klass._chunk_max)
+                    sieve(x, klass._candidates, klass._chunk_max, klass._chunk_max_sqrt)
             if klass._n in klass._candidates:
-                klass.sieve(klass._n, klass._candidates, klass._chunk_max)
+                sieve(klass._n, klass._candidates, klass._chunk_max, klass._chunk_max_sqrt)
             klass._n += 1
 
 primes = PrimeFactory()
+
+
+def fast_primes(n):
+    """Input n>=6, Returns a list of primes, 2 <= p < n
+
+    http://stackoverflow.com/questions/2068372/fastest-way-to-list-all-primes-below-n-in-python/3035188#3035188
+    """
+    correction = int(n%6>1)
+    n = {0:n,1:n-1,2:n+4,3:n+3,4:n+2,5:n+1}[n%6]
+    sieve = [True] * (n/3)
+    sieve[0] = False
+    for i in xrange(int(n**0.5)/3+1):
+        if sieve[i]:
+            k = 3*i+1|1
+            k_2 = k*k
+            k2 = k*2
+            sieve[      ((k_2)/3)      ::k2] = [False]*((n/6-(k_2)/6-1)/k+1)
+            sieve[(k_2+4*k-2*k*(i&1))/3::k2] = [False]*((n/6-(k_2+4*k-k2*(i&1))/6-1)/k+1)
+    return [2,3] + [3*i+1|1 for i in xrange(1,n/3-correction) if sieve[i]]
 
 
 def product(n):
