@@ -13,14 +13,14 @@ from util import primes
 
 def primes_test():
     p = 0
-    for prime in primes.primes(max_step=6):
+    for prime in primes(max_step=6):
         p = prime
 
     assert_equal(p, 13)
 
 def main():
     p = 0
-    for prime in primes.primes(max_step=10001):
+    for prime in primes(max_step=10001):
         p = prime
     return p
     

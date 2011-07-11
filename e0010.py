@@ -9,10 +9,10 @@ import math
 import pprint
 from collections import deque
 
-from util import fast_primes
+from util import primes
 
 def sumprimes(max_term=10):
-    return sum(fast_primes(max_term))
+    return sum(primes.fast_primes(max_term))
 
 
 def sumprimes_test():
