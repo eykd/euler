@@ -37,14 +37,11 @@ def binary_search(a, test, lo=0, hi=None):
 def factor(n):
     """Return the prime factors of n.
     """
-    print "Factoring", n
     factors = deque()
     for x in primes():
-        print "Testing", x
         while not n % x:
             factors.append(x)
             n = n / x
-            print "Remainder:", n
         if n == 1:
             return factors
 
